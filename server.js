@@ -279,7 +279,14 @@ app.get("/api",async(req,res)=>{
 app.use(express.static(__dirname+"/public"));
 app.use((req,res)=>res.sendFile(path.join(__dirname,"public","index.html")));
 
-mongoose.connect(process.env.MONGODB_URI).then(async()=>{
-  console.log("MongoDB connected:",mongoose.connection.name);
+if (process.env.MONGODB_URI) {
+  mongoose.connect(process.env.MONGODB_URI).then(async()=>{
+    console.log("MongoDB connected:",mongoose.connection.name);
+  }).catch(e=>{console.error("MongoDB connection failed:",e);});
+}
+
+if (process.env.NODE_ENV !== "production" || process.env.VERCEL !== "1") {
   app.listen(PORT,()=>console.log(`OHE Track server: http://localhost:${PORT}`));
-}).catch(e=>{console.error("MongoDB connection failed:",e);process.exit(1)});
+}
+
+export default app;
