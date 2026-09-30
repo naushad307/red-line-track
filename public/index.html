@@ -3724,7 +3724,7 @@ function apiPost(action, data={}){
     method:'POST',
     mode:'cors',
     cache:'no-store',
-    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    headers:{'Content-Type':'application/json'},
     body:JSON.stringify(Object.assign({action},data)),
     signal:controller.signal
   }).then(async r=>{
