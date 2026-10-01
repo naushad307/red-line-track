@@ -70,7 +70,7 @@ async function readAllData(){
   const settings=await models.app_settings.find({}).lean();
   for(const s of settings) payload[s.key]=s.value;
   const v=await models.app_settings.findOne({key:"version"}).lean();
-  payload.gsheetUrl="/api";
+  payload.gsheetUrl="https://redlinetrack.vercel.app/api";
   payload.gsheetToken="";
   payload._meta={version:v?.value||new Date().toISOString()};
   // Also provide the native DATA keys so the UI's existing applySheetPayload remains usable.
@@ -191,22 +191,22 @@ async function saveAll(payload){
   const meta=pick("meta","Meta");
   if(meta!==undefined) await models.app_settings.updateOne({key:"meta"},{$set:{value:meta}},{upsert:true});
 
-  await models.app_settings.updateOne({key:"gsheetUrl"},{$set:{value:"/api"}},{upsert:true});
+  await models.app_settings.updateOne({key:"gsheetUrl"},{$set:{value:"https://redlinetrack.vercel.app/api"}},{upsert:true});
   await models.app_settings.updateOne({key:"version"},{$set:{value:new Date().toISOString()}},{upsert:true});
   return readAllData();
 }
 
 app.get("/health",(req,res)=>res.json({ok:true,service:"OHE Track MongoDB Backend",time:new Date().toISOString()}));
-app.get("/api/data",async(req,res)=>{
+app.get("https://redlinetrack.vercel.app/api/data",async(req,res)=>{
   try{await requireSession(req); res.json(await readAllData())}catch(e){res.status(401).json({error:errMsg(e)})}
 });
-app.get("/api/data/version",async(req,res)=>{try{await requireSession(req);const v=await models.app_settings.findOne({key:"version"}).lean();res.json({version:v?.value||""})}catch(e){res.status(401).json({error:errMsg(e)})}});
+app.get("https://redlinetrack.vercel.app/api/data/version",async(req,res)=>{try{await requireSession(req);const v=await models.app_settings.findOne({key:"version"}).lean();res.json({version:v?.value||""})}catch(e){res.status(401).json({error:errMsg(e)})}});
 
 // CRUD endpoints for future direct MongoDB use.
-app.get("/api/collection/:collection",async(req,res)=>{try{await requireSession(req);const M=models[req.params.collection];if(!M)return res.status(404).json({error:"Unknown collection"});res.json(await M.find({}).lean())}catch(e){res.status(401).json({error:errMsg(e)})}});
-app.post("/api/collection/:collection",async(req,res)=>{try{await requireSession(req,{admin:true});const M=models[req.params.collection];if(!M)return res.status(404).json({error:"Unknown collection"});const d=await M.create(jsonBody(req));res.status(201).json(cleanDoc(d))}catch(e){res.status(400).json({error:errMsg(e)})}});
-app.put("/api/collection/:collection/:id",async(req,res)=>{try{await requireSession(req,{admin:true});const M=models[req.params.collection];if(!M)return res.status(404).json({error:"Unknown collection"});const d=await M.findByIdAndUpdate(req.params.id,jsonBody(req),{new:true,runValidators:true});if(!d)return res.status(404).json({error:"Record not found"});res.json(cleanDoc(d))}catch(e){res.status(400).json({error:errMsg(e)})}});
-app.delete("/api/collection/:collection/:id",async(req,res)=>{try{await requireSession(req,{admin:true});const M=models[req.params.collection];if(!M)return res.status(404).json({error:"Unknown collection"});await M.findByIdAndDelete(req.params.id);res.json({ok:true})}catch(e){res.status(400).json({error:errMsg(e)})}});
+app.get("https://redlinetrack.vercel.app/api/collection/:collection",async(req,res)=>{try{await requireSession(req);const M=models[req.params.collection];if(!M)return res.status(404).json({error:"Unknown collection"});res.json(await M.find({}).lean())}catch(e){res.status(401).json({error:errMsg(e)})}});
+app.post("https://redlinetrack.vercel.app/api/collection/:collection",async(req,res)=>{try{await requireSession(req,{admin:true});const M=models[req.params.collection];if(!M)return res.status(404).json({error:"Unknown collection"});const d=await M.create(jsonBody(req));res.status(201).json(cleanDoc(d))}catch(e){res.status(400).json({error:errMsg(e)})}});
+app.put("https://redlinetrack.vercel.app/api/collection/:collection/:id",async(req,res)=>{try{await requireSession(req,{admin:true});const M=models[req.params.collection];if(!M)return res.status(404).json({error:"Unknown collection"});const d=await M.findByIdAndUpdate(req.params.id,jsonBody(req),{new:true,runValidators:true});if(!d)return res.status(404).json({error:"Record not found"});res.json(cleanDoc(d))}catch(e){res.status(400).json({error:errMsg(e)})}});
+app.delete("https://redlinetrack.vercel.app/api/collection/:collection/:id",async(req,res)=>{try{await requireSession(req,{admin:true});const M=models[req.params.collection];if(!M)return res.status(404).json({error:"Unknown collection"});await M.findByIdAndDelete(req.params.id);res.json({ok:true})}catch(e){res.status(400).json({error:errMsg(e)})}});
 
 async function authAction(action,p){
   if(action==="initializeAdmin"){
@@ -251,7 +251,7 @@ async function authAction(action,p){
   throw new Error("Unknown action.");
 }
 
-app.post("/api",authLimiter,async(req,res)=>{
+app.post("https://redlinetrack.vercel.app/api",authLimiter,async(req,res)=>{
   try{
     const p=jsonBody(req), action=p.action;
     if(["login","createUser","findUser","resetPassword","initializeAdmin","logout"].includes(action)){
@@ -268,7 +268,7 @@ app.post("/api",authLimiter,async(req,res)=>{
 });
 
 // Compatibility GET used by the existing HTML's fetchFromSheet().
-app.get("/api",async(req,res)=>{
+app.get("https://redlinetrack.vercel.app/api",async(req,res)=>{
   try{
     if(req.query.mode==="version"){await requireSession(req);const v=await models.app_settings.findOne({key:"version"}).lean();return res.json({version:v?.value||""});}
     await requireSession(req);
@@ -278,7 +278,7 @@ app.get("/api",async(req,res)=>{
 
 app.get("/env.js", (req, res) => {
   res.type("application/javascript");
-  res.send(`window.BACKEND_URL = "${process.env.BACKEND_URL || '/api'}";`);
+  res.send(`window.BACKEND_URL = "${process.env.BACKEND_URL || 'https://redlinetrack.vercel.app/api'}";`);
 });
 
 app.use(express.static(__dirname+"/public"));
