@@ -276,6 +276,11 @@ app.get("/api",async(req,res)=>{
   }catch(e){res.status(401).json({error:errMsg(e)})}
 });
 
+app.get("/env.js", (req, res) => {
+  res.type("application/javascript");
+  res.send(`window.BACKEND_URL = "${process.env.BACKEND_URL || '/api'}";`);
+});
+
 app.use(express.static(__dirname+"/public"));
 app.use((req,res)=>res.sendFile(path.join(__dirname,"public","index.html")));
 
