@@ -632,8 +632,8 @@
         </div>
 
         <div class="mtoolbar">
-          <input type="text" id="gsheetUrl" value="https://redlinetrack.vercel.app/api" readonly title="MongoDB backend is fixed to this application server" style="flex:1;min-width:220px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:6px;font-size:12px;">
-          <script>document.getElementById('gsheetUrl').value = (typeof window.BACKEND_URL !== "undefined" && window.BACKEND_URL) ? window.BACKEND_URL : 'https://redlinetrack.vercel.app/api';</script>
+          <input type="text" id="gsheetUrl" value="/api" readonly title="MongoDB backend is fixed to this application server" style="flex:1;min-width:220px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:6px;font-size:12px;">
+          <script>document.getElementById('gsheetUrl').value = (typeof window.BACKEND_URL !== "undefined" && window.BACKEND_URL) ? window.BACKEND_URL : '/api';</script>
           <span id="gsheetToken" style="display:none;"></span>
           <button class="btn" id="testGsheetBtn">🔍 Test Connection</button>
           <button class="btn primary" id="fetchSheetBtn">⬇ Fetch from MongoDB</button>
@@ -702,9 +702,9 @@ DATA.sectionCommissions = DATA.sectionCommissions || []; // [{sectionFrom, secti
 DATA.crossingReplacements = DATA.crossingReplacements || []; // [{pointNo,line,station,ohe,ch,angle,hand,dateOfLaying,dateOfReplacement}] — GMT Done is always computed live, never stored
 DATA.switchReplacements = DATA.switchReplacements || []; // [{pointNo,section,manufacturer,drawingNo,hand,dateOfLaying,dateOfReplacement,remarks}]
 DATA.extraColumns = DATA.extraColumns || {}; // {tableKey: ['Custom Column Name', ...]} — user-added columns, per table; each record stores its values in record.extra{}
-DATA.gsheetUrl = 'https://redlinetrack.vercel.app/api'; // fixed MongoDB backend endpoint
+DATA.gsheetUrl = '/api'; // fixed MongoDB backend endpoint
 DATA.gsheetToken = ''; // deliberately unused: normal users/admins never enter an API token
-const DEFAULT_GSHEET_URL = 'https://redlinetrack.vercel.app/api';
+const DEFAULT_GSHEET_URL = '/api';
 const DEFAULT_GSHEET_TOKEN = ''; // no API token required
 DATA.atWelds = DATA.atWelds || [];
 DATA.platforms = DATA.platforms || [];
