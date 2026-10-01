@@ -251,28 +251,6 @@ async function authAction(action,p){
   throw new Error("Unknown action.");
 }
 
-let isConnected = false;
-async function connectDB() {
-  if (isConnected || mongoose.connection.readyState >= 1) {
-    isConnected = true;
-    return;
-  }
-  if (process.env.MONGODB_URI) {
-    try {
-      await mongoose.connect(process.env.MONGODB_URI);
-      isConnected = true;
-      console.log("MongoDB connected:", mongoose.connection.name);
-    } catch (e) {
-      console.error("MongoDB connection failed:", e);
-    }
-  }
-}
-
-app.use(async (req, res, next) => {
-  await connectDB();
-  next();
-});
-
 app.post("/api",authLimiter,async(req,res)=>{
   try{
     const p=jsonBody(req), action=p.action;
@@ -300,6 +278,12 @@ app.get("/api",async(req,res)=>{
 
 app.use(express.static(__dirname+"/public"));
 app.use((req,res)=>res.sendFile(path.join(__dirname,"public","index.html")));
+
+if (process.env.MONGODB_URI) {
+  mongoose.connect(process.env.MONGODB_URI).then(async()=>{
+    console.log("MongoDB connected:",mongoose.connection.name);
+  }).catch(e=>{console.error("MongoDB connection failed:",e);});
+}
 
 if (process.env.NODE_ENV !== "production" || process.env.VERCEL !== "1") {
   app.listen(PORT,()=>console.log(`OHE Track server: http://localhost:${PORT}`));
